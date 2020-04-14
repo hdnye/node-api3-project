@@ -5,6 +5,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const postRouter = require('./posts/postRouter');
 const userRouter = require('./posts/userRouter');
+
 const server = express();
 const port = 5000;
 
@@ -12,6 +13,10 @@ const port = 5000;
 server.use(express.json());
 server.use(cors());
 server.use(morgan());
+
+//Route Handlers
+server.use('/posts', postRouter);
+server.use('/users', userRouter);
 
 //Route Error Handler
 server.use((req, res) => {

@@ -1,5 +1,5 @@
 const express = require('express');
-
+const users = request('./userDb');
 const router = express.Router();
 
 router.post('/', (req, res) => {
@@ -32,16 +32,48 @@ router.put('/:id', (req, res) => {
 
 //custom middleware
 
-function validateUserId(req, res, next) {
-  // do your magic!
-}
+function validateUserId() {
+   // do your magic!
+   return (req, res, next) => {
+     users.getById(req.params.id)
+      .then((user) => {
+         if(user) {
+            req.user = user
+            next()
+        }
+      })
+          // Do we need the else error statement or will the Router Error 
+          //Handler in index.js display? 
+          // else {
+          // res.status(404).json({
+          //   message: 'User Not Found.',
+          // })
+        }
+    }
 
-function validateUser(req, res, next) {
+function validateUser() {
   // do your magic!
+  return (req, res, next) => {
+    users.get(req.params)
+      .then((user) => {
+          if(user) {
+            req.user = user
+             next()
+      } 
+    })
+  }
 }
 
 function validatePost(req, res, next) {
   // do your magic!
+  return (req, res, next) => {
+    users.getUserPosts(req.params.userId)
+      .then((post) => {
+        if(post) {
+          res.json(post)
+        }
+      })
+    }
 }
 
 module.exports = router;
