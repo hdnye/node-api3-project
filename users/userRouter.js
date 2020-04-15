@@ -2,11 +2,11 @@ const express = require('express');
 const users = require('./userDb');
 const router = express.Router();
 
-router.post('/', validatePost(), (req, res) => {
+router.post('/', (req, res) => {
   // do your magic!
   users.insert(req.body) 
     .then((user) => {
-      res.status(200).json(user)
+      res.status(201).json(user)
     })
     .catch((error) => {
       next(error)
@@ -37,12 +37,18 @@ router.get('/', validateUser(), (req, res) => {
 
 router.get('/:id', validateUserId(), (req, res) => {
   // do your magic!
-  res.status(200).json(user);
-});
+  users.getById(req.params.id)
+    .then((users) => {
+      res.status(200).json(users);
+    })
+    .catch((error) => {
+      next(error)
+    })
+  });
 
-router.get('/:id/posts', validatePost(), validatePost(), (req, res) => {
+router.get('/:id/posts/:userId', validatePost(), validatePost(), (req, res) => {
   // do your magic!
-  users.getUserPosts(req.params.id) 
+  users.getUserPosts(req.params.id, req.params.userId) 
     .then((posts) => {
       res.status(200).json(posts)
     })
@@ -66,7 +72,7 @@ router.delete('/:id', validateUserId(), (req, res) => {
 
 router.put('/:id', validateUserId(), (req, res) => {
   // do your magic!
-  users.update(req/params.id, req.body) 
+  users.update(req.params.id, req.body) 
     .then((user) => {
       res.status(200).json(user)
     })
