@@ -1,35 +1,78 @@
 const express = require('express');
-const users = request('./userDb');
+const users = require('./userDb');
 const router = express.Router();
 
 router.post('/', validatePost(), (req, res) => {
   // do your magic!
-  res.status(200).json()
+  users.insert(req.body) 
+    .then((user) => {
+      res.status(200).json(user)
+    })
+    .catch((error) => {
+      next(error)
+    })  
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validateUserId(), (req, res) => {
   // do your magic!
-});
+  users.getUserPosts(req.params.id)
+    .then((posts) => {
+      res.status(200).json(posts) 
+    })
+    .catch((error) => {
+      next(error)
+    })
+  });
 
 router.get('/', validateUser(), (req, res) => {
   // do your magic!
-  res.status(200).json();
+  users.get(req.params.id)
+    .then((users) => {
+      res.status(200).json(users);
+    })
+    .catch((error) => {
+      next(error)
+    })
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateUserId(), (req, res) => {
   // do your magic!
+  res.status(200).json(user);
 });
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validatePost(), validatePost(), (req, res) => {
   // do your magic!
+  users.getUserPosts(req.params.id) 
+    .then((posts) => {
+      res.status(200).json(posts)
+    })
+    .catch((error) => {
+      next(error)
+    })
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId(), (req, res) => {
   // do your magic!
+  users.remove(req.params.id) 
+    .then((user) => {
+      res.status(200).json({
+        message: 'User has been removed.',
+      })
+    })
+    .catch((error) => {
+      next(error)
+    })
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId(), (req, res) => {
   // do your magic!
+  users.update(req/params.id, req.body) 
+    .then((user) => {
+      res.status(200).json(user)
+    })
+    .catch((error) => {
+      next(error)
+    })
 });
 
 //custom middleware
@@ -42,14 +85,18 @@ function validateUserId() {
          if(user) {
             req.user = user
             next()
-        }
-      })
+        }      
           // Do we need the else error statement or will the Router Error 
           //Handler in index.js display? 
-          // else {
-          // res.status(404).json({
-          //   message: 'User Not Found.',
-          // })
+          else {
+          res.status(404).json({
+            message: 'Invalid User Id',
+          })
+        }  
+     })    
+        .catch((error) => {
+           next(error)
+          })
         }
     }
 
@@ -60,13 +107,21 @@ function validateUser() {
       .then((user) => {
           if(user) {
             req.user = user
-             next()
-      } 
+            next()
+      } else {
+        res.status(404).json({
+          message: 'Missing User Data',
+        })
+      }  
     })
+      .catch((error) => {
+        next(error)
+       })
+     }
   }
-}
 
-function validatePost(req, res, next) {
+
+function validatePost() {
   // do your magic!
   return (req, res, next) => {
     users.getUserPosts(req.params.userId)
@@ -74,10 +129,18 @@ function validatePost(req, res, next) {
         if(post) {
           res.json(post)
           next()
-        }
+        } else {
+          res.status(404).json({
+            message: 'User Not Found.',
+          })
+        }  
       })
-    }
-}
+      .catch((error) => {
+        next(error)
+       })
+     }
+   }
+
 
 
 module.exports = router;
