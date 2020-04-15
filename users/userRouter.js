@@ -2,16 +2,18 @@ const express = require('express');
 const users = request('./userDb');
 const router = express.Router();
 
-router.post('/', (req, res) => {
+router.post('/', validatePost(), (req, res) => {
   // do your magic!
+  res.status(200).json()
 });
 
 router.post('/:id/posts', (req, res) => {
   // do your magic!
 });
 
-router.get('/', (req, res) => {
+router.get('/', validateUser(), (req, res) => {
   // do your magic!
+  res.status(200).json();
 });
 
 router.get('/:id', (req, res) => {
@@ -71,9 +73,11 @@ function validatePost(req, res, next) {
       .then((post) => {
         if(post) {
           res.json(post)
+          next()
         }
       })
     }
 }
+
 
 module.exports = router;
