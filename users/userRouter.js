@@ -78,8 +78,11 @@ router.put('/:id', validateUserId(), (req, res) => {
       res.status(200).json(user)
     })
     .catch((error) => {
-       next(error)
-    })
+      console.log(error)
+      res.status(500).json({
+        message: "Unable to Update User.",
+     })
+    }) 
 });
 
 //custom middleware
