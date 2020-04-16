@@ -74,10 +74,11 @@ router.put('/:id', validateUserId(), (req, res) => {
   // do your magic!
   users.update(req.params.id, req.body) 
     .then((user) => {
+      console.log(user)
       res.status(200).json(user)
     })
     .catch((error) => {
-      next(error)
+       next(error)
     })
 });
 
